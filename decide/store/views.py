@@ -61,7 +61,7 @@ class StoreView(generics.ListAPIView):
         a = vote.get("a")
         b = vote.get("b")
 
-        defs = { "a": a, "b": b }
+        defs = {"a": a, "b": b}
         v, _ = Vote.objects.get_or_create(voting_id=vid, voter_id=uid,
                                           defaults=defs)
         v.a = a
@@ -69,4 +69,28 @@ class StoreView(generics.ListAPIView):
 
         v.save()
 
-        return  Response({})
+        return Response({})
+
+    def put(self, request):
+        """
+         * vote_id: id
+         * vote: {"a": int, "b": int}
+
+        """
+
+        req_vote_id = request.data.get("vote_id")
+        req_vote = request.data.get("vote")
+
+        vote = Vote.objects.get(pk=req_vote_id)
+
+        vote.a = req_vote.get("a")
+        vote.b = req_vote.get("b")
+
+        vote.save()
+
+        print(vote)
+
+        return Response({
+            "vote_id": req_vote_id,
+            "vote": req_vote
+        })

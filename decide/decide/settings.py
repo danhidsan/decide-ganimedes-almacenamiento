@@ -162,7 +162,7 @@ else:
     try:
         from local_settings import *
     except ImportError:
-        print("local_settings.example.py not found")
+        print("local_settings.py not found")
 
 
 INSTALLED_APPS = INSTALLED_APPS + MODULES
