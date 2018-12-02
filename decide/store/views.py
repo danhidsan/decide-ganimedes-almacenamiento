@@ -29,15 +29,9 @@ class StoreView(generics.ListAPIView):
          * vote: { "a": int, "b": int }
         """
 
+        # Validating voting
         vid = request.data.get('voting')
-        voting = mods.get('voting', params={'id': vid})
-        if not voting or not isinstance(voting, list):
-            return Response({}, status=status.HTTP_401_UNAUTHORIZED)
-        start_date = voting[0].get('start_date', None)
-        end_date = voting[0].get('end_date', None)
-        not_started = not start_date or timezone.now() < parse_datetime(start_date)
-        is_closed = end_date and parse_datetime(end_date) < timezone.now()
-        if not_started or is_closed:
+        if not self.validate_voting(vid):
             return Response({}, status=status.HTTP_401_UNAUTHORIZED)
 
         uid = request.data.get('voter')
@@ -97,15 +91,8 @@ class StoreView(generics.ListAPIView):
             return Response({"message": "Unauthorized operation for this user"}, status=status.HTTP_401_UNAUTHORIZED)
 
         # Validating vote's voting
-        voting = mods.get('voting', params={'id': vote.voting_id})
-        if not voting or not isinstance(voting, list):
-            return Response({"message": "Unauthorized operation in voting"}, status=status.HTTP_401_UNAUTHORIZED)
-        start_date = voting[0].get('start_date', None)
-        end_date = voting[0].get('end_date', None)
-        not_started = not start_date or timezone.now() < parse_datetime(start_date)
-        is_closed = end_date and parse_datetime(end_date) < timezone.now()
-        if not_started or is_closed:
-            return Response({"message": "Unauthorized operation voting"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not self.validate_voting(vote.voting_id):
+            return Response({"message": "Unauthorized operation for this voting"}, status=status.HTTP_401_UNAUTHORIZED)
 
         vote.a = req_vote.get("a")
         vote.b = req_vote.get("b")
@@ -115,3 +102,16 @@ class StoreView(generics.ListAPIView):
         return Response({
             "vote_id": "Vote has been modified successfully"
         })
+
+    def validate_voting(self, voting_id):
+        voting = mods.get('voting', params={'id': voting_id})
+        if not voting or not isinstance(voting, list):
+            return False
+        start_date = voting[0].get('start_date', None)
+        end_date = voting[0].get('end_date', None)
+        not_started = not start_date or timezone.now() < parse_datetime(start_date)
+        is_closed = end_date and parse_datetime(end_date) < timezone.now()
+        if not_started or is_closed:
+            return False
+
+        return True
