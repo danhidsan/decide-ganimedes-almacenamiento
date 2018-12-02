@@ -81,16 +81,37 @@ class StoreView(generics.ListAPIView):
         req_vote_id = request.data.get("vote_id")
         req_vote = request.data.get("vote")
 
+        # Get vote by id
         vote = Vote.objects.get(pk=req_vote_id)
+
+        # Get vote user by token
+        if not request.auth:
+            return Response({"message": "Unauthorized operation"}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            token = request.auth.key
+        voter = mods.post('authentication', entry_point='/getuser/', json={'token': token})
+        voter_id = voter.get('id', None)
+
+        # Validating vote's voter
+        if not voter_id or voter_id != vote.voter_id:
+            return Response({"message": "Unauthorized operation for this user"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Validating vote's voting
+        voting = mods.get('voting', params={'id': vote.voting_id})
+        if not voting or not isinstance(voting, list):
+            return Response({"message": "Unauthorized operation in voting"}, status=status.HTTP_401_UNAUTHORIZED)
+        start_date = voting[0].get('start_date', None)
+        end_date = voting[0].get('end_date', None)
+        not_started = not start_date or timezone.now() < parse_datetime(start_date)
+        is_closed = end_date and parse_datetime(end_date) < timezone.now()
+        if not_started or is_closed:
+            return Response({"message": "Unauthorized operation voting"}, status=status.HTTP_401_UNAUTHORIZED)
 
         vote.a = req_vote.get("a")
         vote.b = req_vote.get("b")
 
         vote.save()
 
-        print(vote)
-
         return Response({
-            "vote_id": req_vote_id,
-            "vote": req_vote
+            "vote_id": "Vote has been modified successfully"
         })
