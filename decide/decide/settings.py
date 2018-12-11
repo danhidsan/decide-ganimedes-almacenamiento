@@ -68,7 +68,10 @@ MODULES = [
     'voting',
 ]
 
-BASEURL = 'http://localhost:8000'
+#BASEURL = 'http://localhost:8000'
+BASEURL = 'https://decide-ganimedes-store.herokuapp.com'
+
+APIS = {}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -152,6 +155,9 @@ STATIC_URL = '/static/'
 
 # number of bits for the key, all auths should use the same number of bits
 KEYBITS = 256
+
+import django_heroku
+django_heroku.settings(locals())
 
 if 'TRAVIS' in os.environ:
     try:
