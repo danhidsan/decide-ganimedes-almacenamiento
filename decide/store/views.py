@@ -1,9 +1,11 @@
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django.core.mail import send_mail
 import django_filters.rest_framework
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import generics
+import smtplib
 
 from voting.models import Voting
 from .models import Vote
@@ -109,6 +111,35 @@ class StoreView(generics.ListAPIView):
 
             # save vote
             v.save()
+            self.notificacion_voto(v)
+
 
         return Response({"message": "votes stored successfully"})
+
+#FORMA 1
+    # def notificacion_voto(self, vote):
+    #
+    #     from_addr = 'info@rqlogic.com'
+    #     to = 'urodoz@gmail.com'
+    #     message = 'This is a test Email from python'
+    #
+    #     # Reemplaza estos valores con tus credenciales de Google Mail
+    #     username = 'majive02696'
+    #     password = 'ContrasenyaGmail'
+    #
+    #     server = smtplib.SMTP('smtp.gmail.com:587')
+    #     server.starttls()
+    #     server.login(username, password)
+    #     server.sendmail(from_addr, to, message)
+    #
+    #     server.quit()
+
+    def notificacion_voto(self, vote):
+        send_mail(
+            'Subject here',
+            'Here is the message.',
+            'majive02696@gmail.com',
+            ['majive026962@gmail.com'],
+            fail_silently=False,
+        )
 
