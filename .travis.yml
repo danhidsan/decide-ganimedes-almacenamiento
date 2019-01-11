@@ -32,7 +32,8 @@ install:
 before_script:
   - psql -c "create user decide with password 'decide'" -U postgres
   - psql -c "create database decide owner decide" -U postgres
-  - mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+  - apt-get install -y mongodb-org
+  - service mongod start
   - use mongo
 
 
@@ -40,6 +41,7 @@ before_script:
 script:
   - python ./decide/manage.py makemigrations
   - python ./decide/manage.py migrate
+  - python manage.py migrate --database=mongo
 #  - python ./decide/manage.py compilemessages
   - python ./decide/manage.py test ./decide
   - if [[ $TRAVIS_BRANCH == $RAMA_TRAVIS ]] && [[ $DEPLOY_TRAVIS == "1" ]]; then git archive --format zip --output ./$NOMBRE_ZIP.zip $RAMA_TRAVIS; echo "Zip generado correctamente."; fi
