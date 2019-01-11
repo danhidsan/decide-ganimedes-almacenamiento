@@ -22,6 +22,7 @@ addons:
 
 services:
   - postgresql
+  - mongodb
 
 env:
   - DJANGO_SETTINGS_MODULE="decide.settings"
@@ -30,13 +31,16 @@ install:
   - pip install -r requirements.txt
 
 before_script:
+  - sleep 15
   - psql -c "create user decide with password 'decide'" -U postgres
   - psql -c "create database decide owner decide" -U postgres
+
 
 script:
   - python ./decide/manage.py makemigrations
   - python ./decide/manage.py migrate
-#  - python ./decide/manage.py compilemessages
+  - python ./decide/manage.py migrate --database=mongo
+  # - python ./decide/manage.py compilemessages
   - python ./decide/manage.py test ./decide
   - if [[ $TRAVIS_BRANCH == $RAMA_TRAVIS ]] && [[ $DEPLOY_TRAVIS == "1" ]]; then git archive --format zip --output ./$NOMBRE_ZIP.zip $RAMA_TRAVIS; echo "Zip generado correctamente."; fi
 

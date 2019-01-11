@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 # Definimos el procesador de contexto para i18n
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -105,10 +106,19 @@ TEMPLATES = [
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+DATABASE_ROUTERS = ['store.dbRouter.StoreDBRouter']
+
+#app1.dbRouter.App1DBRouter
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    'mongo': {
+        'ENGINE': 'djongo',
+        'NAME': 'mongo',
     }
 }
 
