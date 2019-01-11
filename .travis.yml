@@ -32,6 +32,10 @@ install:
 before_script:
   - psql -c "create user decide with password 'decide'" -U postgres
   - psql -c "create database decide owner decide" -U postgres
+  - mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+  - use mongo
+
+
 
 script:
   - python ./decide/manage.py makemigrations
