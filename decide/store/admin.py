@@ -9,6 +9,7 @@ import datetime
 
 from .models import Vote
 
+
 # Admin export votes action
 def export_votes_as_csv(modeladmin, request, queryset):
 
@@ -20,8 +21,7 @@ def export_votes_as_csv(modeladmin, request, queryset):
       "desc", 
       "start_date", 
       "end_date", 
-      "pub_key_id", 
-      "question_id", 
+      "pub_key_id",
       "postproc", 
       "tally"
       ]
@@ -46,9 +46,9 @@ def export_votes_as_csv(modeladmin, request, queryset):
     for obj in queryset:
         votes = Vote.objects.filter(voting_id=obj.id)
         votings_file_writer.writerow([getattr(obj, field) for field in votings_field_names])
-        #iterating votes by voting
+        # iterating votes by voting
         for v in votes:
-          votes_file_writer.writerow([getattr(v, field) for field in votes_field_names])
+            votes_file_writer.writerow([getattr(v, field) for field in votes_field_names])
 
     # create zip buffer
     zipped_file = io.BytesIO()
@@ -70,10 +70,12 @@ def export_votes_as_csv(modeladmin, request, queryset):
 
     return response
 
+
 # Admin vote model
 class VoteAdmin(admin.ModelAdmin):
-  list_display = ['id', 'voting_id', 'voter_id', 'voted']
-  readonly_fields = ['id', 'voting_id', 'voter_id', 'voted']
-  search_fields = ['voting_id',]
+    list_display = ['id', 'voting_id', 'voter_id', 'voted']
+    readonly_fields = ['id', 'voting_id', 'voter_id', 'voted']
+    search_fields = ['voting_id', ]
+
 
 admin.site.register(Vote, VoteAdmin)

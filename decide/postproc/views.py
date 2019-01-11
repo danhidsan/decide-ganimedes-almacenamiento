@@ -14,10 +14,19 @@ class PostProcView(APIView):
                 'postproc': opt['votes'],
             })
         out.sort(key=lambda x: -x['postproc'])
-        return Response(out)
+        return out
 
     def weight(self, options):
-        return self.identity(options)  # TODO
+        out = []
+
+        for opt in options:
+            out.append({
+                **opt,
+                'postproc': opt['votes'] * opt['weight'],
+            })
+
+        out.sort(key=lambda x: -x['postproc'])
+        return out
 
     def seats(self, options, sts):
 
@@ -57,7 +66,7 @@ class PostProcView(APIView):
             partido = opt_con_escanos[indice_ganador]
             partido["postproc"] += 1
         opt_con_escanos.sort(key=lambda x: -x['postproc'])
-        return Response(opt_con_escanos)
+        return opt_con_escanos
 
     def team(self, options):
 
@@ -81,38 +90,38 @@ class PostProcView(APIView):
                 for opt in options:
                     if opt['team'] == ind:
                         listax.append(opt)
-                listax.sort(key = lambda x: -x['votes'])
+                listax.sort(key=lambda x: -x['votes'])
                 for l in listax:
                     sorted_teams.append(l)
             return sorted_teams
 
         n_teams = obtener_n_equipos()
         votes_per_team = atribuir_votos()
-        equipos_mayor_a_menor = sorted(votes_per_team, key=int, reverse = True)
+        equipos_mayor_a_menor = sorted(votes_per_team, key=int, reverse=True)
         equipos = lista_ordenada(votes_per_team, equipos_mayor_a_menor)
-        return Response(equipos)
+        return equipos
 
     def parity(self, options):
         return self.identity(options)  # TODO
 
     def post(self, request):
         t = request.data.get('type', PostProcType.IDENTITY)
-        opts = request.data.get('options', [])
-        sts = request.data.get('seats', -1)
+        qsts = request.data.get('questions', [])
+        results = {}
 
-        if t == PostProcType.IDENTITY:
-            return self.identity(opts)
-        elif t == PostProcType.WEIGHT:
-            return self.weight(opts)
-        elif t == PostProcType.SEATS:
-            return self.seats(opts, sts)
-        elif t == PostProcType.PARITY:
-            return self.parity(opts)
-        elif t == PostProcType.TEAM:
-            return self.team(opts)
+        for qst in qsts:
+            if t == PostProcType.IDENTITY:
+                results[qst['id']] = self.identity(qst['options'])
+            elif t == PostProcType.WEIGHT:
+                results[qst['id']] = self.weight(qst['options'])
+            elif t == PostProcType.SEATS:
+                sts = qst['seats']
+                results[qst['id']] = self.seats(qst['options'], sts)
+            elif t == PostProcType.PARITY:
+                results[qst['id']] = self.parity(qst['options'])
+            elif t == PostProcType.TEAM:
+                results[qst['id']] = self.team(qst['options'])
+            else:
+                results[qst['id']] = self.identity(qst['options'])
 
-        return self.identity(opts)
-
-
-
-
+        return Response(results)

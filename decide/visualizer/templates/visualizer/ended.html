@@ -4,18 +4,154 @@
 {% endblock %}
 {% block menu_options %}
 {% endblock %}
+{% block extrahead %}
+    <link type="text/css" rel="stylesheet" href="{% static "decide/css/visualizer/ended.css"%}"/>
+{% endblock %}
 {% block content %}
-    <h4>{{ voting.id }} - {{ voting.name }}</h4>
+    {% load static %}
+    <script type="text/javascript" src="{% static "decide/js/Chart.js"%}"></script>
+    <div id="cabecera-votacion">
+        <h4>{{ voting.name }}</h4>
+        <h5>{% trans "Results: " %}</h5>
+    </div>
 
-        <h5>{% trans 'Results: ' %}</h5>
         <ul>
             {% for option in voting.postproc %}
                 <li>{{option.option}}: {{option.postproc}} <span>({{option.votes}})</span></li>
             {% endfor %}
         </ul>
 
-    <a href="pdf/" target="_blank">Descargar los resultado en formato .pdf</a>
-    <br/>
-    <a href="csv/" target="_blank">Descargar los resultado en formato .csv</a>
+    <div style="width: 50%">
+        <canvas id="resultados" width="100%" height="50%"></canvas>
+    </div>
 
+    {% with voting.postproc|first as firstVote %}
+    
+    {% if firstVote.team != None %}
+    {% regroup voting.postproc by team as teams %}
+    <!--Pintado de gráfica para Teams-->
+    <script>
+
+    function getRandomColor() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ", 0.5)";
+    }
+    var colors = [];
+    {% for option in voting.postproc %}
+    colors.push(getRandomColor());
+    {% endfor %}
+    
+    var ctx = document.getElementById("resultados").getContext("2d");
+    var myChart = new Chart(ctx, {
+        type:"bar",
+        data: {
+            labels:[{% for t in teams %}{% if forloop.first %}"{{t.grouper}}"{% else %},"{{t.grouper}}"{% endif %}{% endfor %}],
+            datasets: [{% for t in teams %}{% for option in t.list %}{label: "{{ option.option }}",backgroundColor: colors,data:[{% for team in teams %}{% if team.grouper == option.team %}{{option.votes}},{% else %}0,{% endif %}{% endfor %}]},{% endfor %}{% endfor %}]
+        },
+
+        options:{
+            scales:{
+                yAxes:[{
+                    stacked:true
+                }],
+                xAxes:[{
+                    stacked:true
+                }]
+            }
+        }
+    });
+    </script>
+    
+    {% elif firstVote.gender != None %}
+        <!--TODO Pintado de grafica para Parity -->
+
+    {% elif firstVote.gender == None and firstVote.team == None %}
+
+    <!--Pintado de gráfica para Identity-->
+    <script>
+        var ctx = document.getElementById("resultados");
+        
+        function getRandomColor() {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            return "rgb(" + r + "," + g + "," + b + ", 0.5)";
+        }
+        var colors = [];
+        {% for option in voting.postproc %}
+        colors.push(getRandomColor());
+        {% endfor %}
+        
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for option in voting.postproc %}{% if forloop.first %}"{{option.option}}"{% else %},"{{option.option}}"{% endif %}{% endfor %}],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [{% for option in voting.postproc %}{% if forloop.first %}{{option.votes}}{% else %},{{option.votes}}{% endif %}{% endfor %}],
+                    backgroundColor: colors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+
+    {% else %}
+    
+    <!--Pintado de grafica para escaños-->
+    <script>
+
+    function getRandomColor() {
+        var r = Math.floor(Math.random() * 255);
+        var g = Math.floor(Math.random() * 255);
+        var b = Math.floor(Math.random() * 255);
+        return "rgb(" + r + "," + g + "," + b + ", 0.5)";
+    }
+
+    var colors = [];
+    {% for option in voting.postproc %}
+       colors.push(getRandomColor());
+    {% endfor %}
+
+    var ctx = document.getElementById("resultados");
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data:  {
+        labels: [{% for option in voting.postproc %}{% if forloop.first %}"{{option.option}}"{% else %},"{{option.option}}"{% endif %}{% endfor %}],
+        datasets: [{
+            label: '# of Votes',
+            data: [{% for option in voting.postproc %}{% if forloop.first %}{{option.postproc}}{% else %},{{option.postproc}}{% endif %}{% endfor %}],
+            backgroundColor: colors,
+            borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            circumference: Math.PI,
+            animation: {
+					animateScale: true,
+					animateRotate: true
+				},
+            rotation: -Math.PI
+        }
+    });
+    </script>
+
+    {% endif %}
+    <a href="pdf/" target="_blank">{% trans "Download results as .pdf" %}</a>
+    <br/>
+    <a href="csv/" target="_blank">{% trans "Download results as .csv" %}</a>
+    {% endwith %}
 {% endblock %}
+

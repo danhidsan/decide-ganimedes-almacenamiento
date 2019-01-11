@@ -11,3 +11,8 @@ class UserIsStaff(permissions.BasePermission):
         response = mods.post('authentication/getuser', json={'token': request.auth.key},
                 response=True)
         return response.json().get('is_staff', False)
+
+class CensusPermissions(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return True

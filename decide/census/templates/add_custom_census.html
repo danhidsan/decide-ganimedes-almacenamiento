@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Creación de censos mediante filtros{% endblock %}
+
+{% block content %}
+    <div>
+        <h4>Censando votantes en una votación</h4>
+
+        <div>
+            <form action="{% url 'addCustomCensus' %}" method="POST">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td><label>{{ form.voting.label }}</label>{{ form.voting }}</td>
+                    </tr>
+                </table>
+                <h5>Filtrado</h5>
+                <table>
+                    <tr>
+                        <td colspan="2"><label>{{ form.sex.label }}</label>{{ form.sex }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><label>{{ form.city.label }}</label>{{ form.city }}</td>
+                    </tr>
+                    <tr>
+                        <td><label>{{ form.age_initial_range.label}}</label>{{ form.age_initial_range }}</td>
+                        <td><label>{{ form.age_final_range.label }}</label>{{ form.age_final_range }}</td>
+                    </tr>
+                </table>
+                <br/>
+                <input type="submit" value="Submit">
+            </form>
+            <br/><br/>
+        </div>
+
+        <h4>Pruebas temporales (hasta que se implemente el menú principal)</h4>
+        <div>
+            <h5>Exportar CSV</h5>
+            <button onclick="window.location='{% url 'exportCSV' %}'"
+                    title="Exportar CSV" class="button">
+                    Exportar CSV
+            </button>
+
+            <h5>Importar CSV</h5>
+            <form action="{% url 'importCSV' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="file">
+                <p>Solo acepta ficheros CSV</p>
+                <button type="save">Upload CSV</button>
+            </form>
+            <br/><br/>
+        </div>
+    </div>
+{% endblock %}

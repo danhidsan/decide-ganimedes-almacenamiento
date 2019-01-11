@@ -1,15 +1,21 @@
+{% load i18n static %}
+
 <!DOCTYPE html>
 <html>
     <head>
         {% load static %}
         <!--Import Google Icon Font-->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <!--Import ajax and jquery-->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.js"></script>
 
         <!--Import materialize.css-->
         <link type="text/css" rel="stylesheet" href="{% static "decide/css/base.css"%}"/>
         <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab" rel="stylesheet">
         
-        <link type="text/css" rel="stylesheet" href="{% static "decide/css/materialize.css"%}">
+        <link type="text/css" rel="stylesheet" href="{% static "decide/css/materialize.css"%}"> 
         <!--Import materialize.js-->
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -17,25 +23,96 @@
         <title>{% block title %}Decide!{% endblock %}</title>
         {% block extrahead %}
         {% endblock %}
-        
+      
+        <!-- Initialize Materialize JS -->
+        <script type="text/javascript">
+            function initMaterialize(){
+                M.AutoInit();
+            } 
+      
+            $(document).ready(function(){
+              $('select').formSelect();
+            });
+        </script>
+          
     </head>
-    <body>
-        <script type="text/javascript" src="{% static "decide/js/materialize.js"%}"></script>
+
+    <body onload="initMaterialize()">
+
         <nav class="menu">
-            <div class="nav-wrapper blue-grey darken-2">
-                <a href="#" class="brand-logo center">Ganímedes</a>
-                    <ul id="nav-mobile" class="right hide-on-med-and-down">
-                        {% block menu_options %}
-                        {% endblock %}
-                    </ul>
+                <div class="nav-wrapper blue-grey darken-2">
+                    <a href="/" class="brand-logo right">Ganímedes<i class="material-icons right">data_usage</i></a>
+                        <ul id="nav-mobile" class="left hide-on-med-and-down">
+                            {% block menu_options %}
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post">
+                                    {% csrf_token %}
+                                    <input name="next" type="hidden" value="{{ redirect_to }}" />
+                                    <div class="col s12 language1">
+                                        <select class="browser-default" name="language" onchange="this.form.submit()">
+                                            {% get_current_language as LANGUAGE_CODE %}
+                                            {% get_available_languages as LANGUAGES %}
+                                            {% for lang in LANGUAGES %}
+                                            <option value="{{ lang.0 }}" {% if lang.0 == LANGUAGE_CODE %} selected disabled hidden {% endif %}>
+                                                {{ lang.1 }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </form>
+                            </li>
+                            <li><a href="#">Link 1</a></li>
+                            <li><a href="#">Link 2</a></li>
+                            <li><a href="#">Link 3</a></li>
+                            {% endblock %}
+                        </ul>
                 </div>
-            </nav>
+        </nav>
+    
+       
+        
+        <style>
+        .language {
+            width:115px;
+        }
+        .language1 {
+            margin-top:10px !important;
+        }
+        .language2 {
+            opacity:0.9 !important;
+            border-radius: 6px !important;
+        }
+        
+        </style>
+         
+            
+        <script type="text/javascript" src="{% static "decide/js/materialize.js"%}"></script>
+        
         <div class="body">
             {% block content %}
             {% endblock %}
 
-            {% block extrabody %}{% endblock %}
+            {% block extrabody %}
+
+            {% endblock %}
         </div>
-        
+        <div class="decideFooter">
+            <footer class="page-footer blue-grey darken-2">
+                    <div class="container">
+                    <div class="row">
+                        <div class="col l6 s12">
+                        <h5 class="white-text">Footer Content</h5>
+                        <p class="grey-text text-lighten-4">Information.</p>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="footer-copyright">
+                    <div class="container">
+                    © 2018 Copyright Text
+                    <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+                    </div>
+                    </div>
+            </footer> 
+        </div>  
     </body>
 </html>

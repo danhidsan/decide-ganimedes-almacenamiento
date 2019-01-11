@@ -5,8 +5,23 @@
 {% block menu_options %}
 {% endblock %}
 {% block content %}
-    <h1>{{ voting.id }} - {{ voting.name }}</h1>
+    <link type="text/css" rel="stylesheet" href="{% static "decide/css/visualizer/not_started.css"%}"/>
+    <div class="content">
+        <h4>{{ voting.name }}</h4>
+        <br>
 
-    <h2>{% trans 'Voting not started' %}</h2>
+            <div class="col s12 m5">
+              <div class="card-panel  teal darken-1">
+                <span class="white-text">
+                    <p class="white-text">{% trans "Voting not started" %}</p>
+                </span>
+              </div>
+            </div>
+
+
+        
+
+    </div>
+    
 
 {% endblock %}

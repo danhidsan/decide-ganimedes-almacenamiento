@@ -1,6 +1,6 @@
 import datetime
 import random
-from django.contrib.auth.models import User
+from authentication.models import User
 from django.utils import timezone
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -22,27 +22,30 @@ class StoreTextCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.question = Question(desc='qwerty')
-        self.question.save()
         self.voting = Voting(pk=5001,
                              name='voting example',
-                             question=self.question,
                              postproc_type=PostProcType.IDENTITY,
                              start_date=timezone.now(),
                              )
         self.voting.save()
+        self.question = Question(desc='qwerty', voting=self.voting)
+        self.question.save()
+
+
 
     def tearDown(self):
         super().tearDown()
 
     def gen_voting(self, pk):
-        voting = Voting(pk=pk, name='v1', question=self.question, postproc_type=PostProcType.IDENTITY,
+        voting = Voting(pk=pk, name='v1', postproc_type=PostProcType.IDENTITY,
                         start_date=timezone.now(), end_date=timezone.now() + datetime.timedelta(days=1))
         voting.save()
+        q = Question(desc='qwerty', voting=voting)
+        q.save()
 
     def get_or_create_user(self, pk):
         user, _ = User.objects.get_or_create(pk=pk)
-        user.username = 'user{}'.format(pk)
+        user.email = 'user{}@gmail.com'.format(pk)
         user.set_password('qwerty')
         user.save()
         return user
@@ -56,7 +59,7 @@ class StoreTextCase(BaseTestCase):
             self.gen_voting(v)
             random_user = random.choice(users)
             user = self.get_or_create_user(random_user)
-            self.login(user=user.username)
+            self.login(user=user.email)
             census = Census(voting_id=v, voter_id=random_user)
             census.save()
             data = {
@@ -96,7 +99,7 @@ class StoreTextCase(BaseTestCase):
             ]
         }
         user = self.get_or_create_user(1)
-        self.login(user=user.username)
+        self.login(user=user.email)
         response = self.client.post('/store/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
@@ -111,7 +114,7 @@ class StoreTextCase(BaseTestCase):
         response = self.client.get('/store/', format='json')
         self.assertEqual(response.status_code, 401)
 
-        self.login(user='noadmin')
+        self.login(user='noadmin@gmail.com')
         response = self.client.get('/store/', format='json')
         self.assertEqual(response.status_code, 403)
 
@@ -130,7 +133,7 @@ class StoreTextCase(BaseTestCase):
         response = self.client.get('/store/?voting_id={}'.format(v), format='json')
         self.assertEqual(response.status_code, 401)
 
-        self.login(user='noadmin')
+        self.login(user='noadmin@gmail.com')
         response = self.client.get('/store/?voting_id={}'.format(v), format='json')
         self.assertEqual(response.status_code, 403)
 
@@ -157,7 +160,7 @@ class StoreTextCase(BaseTestCase):
         response = self.client.get('/store/?voting_id={}&voter_id={}'.format(v, u), format='json')
         self.assertEqual(response.status_code, 401)
 
-        self.login(user='noadmin')
+        self.login(user='noadmin@gmail.com')
         response = self.client.get('/store/?voting_id={}&voter_id={}'.format(v, u), format='json')
         self.assertEqual(response.status_code, 403)
 
@@ -182,7 +185,7 @@ class StoreTextCase(BaseTestCase):
         self.voting.start_date = timezone.now() + datetime.timedelta(days=1)
         self.voting.save()
         user = self.get_or_create_user(1)
-        self.login(user=user.username)
+        self.login(user=user.email)
         response = self.client.post('/store/', data, format='json')
         self.assertEqual(response.status_code, 401)
 
@@ -204,10 +207,6 @@ class StoreTextCase(BaseTestCase):
         # Generating votes
         votings, voters = self.gen_votes()
 
-        # user login
-        user = self.get_or_create_user(voters[0])
-        self.login(user=user.username)
-        # voters request
         response = self.client.get('/store/users/voting/{}/'.format(votings[2]))
 
         # assert response

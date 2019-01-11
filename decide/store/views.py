@@ -10,21 +10,24 @@ from .models import Vote
 from .serializers import VoteSerializer,VotingSerializer,VoterSerializer
 from base import mods
 from base.perms import UserIsStaff
-from django.contrib.auth.models import User
+from authentication.models import User
 
 
 class VotingView(generics.ListAPIView):
     serializer_class = VotingSerializer
+
     def get(self,request,voting_id):
         voting_id = self.kwargs['voting_id']
-        result=Vote.objects.filter(voting_id=voting_id).values('voter_id')
-        usernames = User.objects.filter(id__in=result)\
-            .values('id','last_login','is_superuser','username','first_name','last_name',
-                        'email','is_staff','is_active','date_joined')
-        return Response(usernames,status=status.HTTP_200_OK)
+        result = Vote.objects.filter(voting_id=voting_id).values('voter_id')
+        voting_users = User.objects.filter(id__in=result)\
+            .values('id', 'last_login', 'is_superuser', 'first_name', 'last_name',
+                    'email', 'is_staff', 'is_active')
+        return Response(voting_users, status=status.HTTP_200_OK)
+
 
 class VoterView(generics.ListAPIView):
     serializer_class = VoterSerializer
+
     def get(self, request,voter_id):
         voter_id=self.kwargs['voter_id']
         votings_id=Vote.objects.filter(voter_id=voter_id).values('voting_id')
@@ -35,6 +38,7 @@ class VoterView(generics.ListAPIView):
         else:
             result= Response(votings,status=status.HTTP_204_NO_CONTENT)
         return result
+
 
 class StoreView(generics.ListAPIView):
     queryset = Vote.objects.all()

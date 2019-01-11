@@ -2,20 +2,100 @@
 {% load i18n static %}
 {% block title %}
 {% endblock %}
+{% block extrahead %}
+    <link type="text/css" rel="stylesheet" href="{% static "decide/css/visualizer/ongoing.css"%}"/>
+{% endblock %}
 {% block menu_options %}
 {% endblock %}
 {% block content %}
-    <h1>{{ voting.id }} - {{ voting.name }}</h1>
 
-    <h2>{% trans 'Voting is open' %}</h2>
-    <h2>{% trans 'Stats' %}</h2>
+    <div id="cabecera-votacion">
+        <h4>{{voting.name}}</h4>
+        <p>{% trans 'In Progress' %}</p>
+    </div>
 
-    <h3>{% trans 'Census Size:' %}  {{stats_census_size}}</h3>
-    <h3>{% trans 'Voters Turnout:' %}  {{stats_voters_turnout}}</h3>
-    <h3>{% trans 'Participation:' %}  {{stats_participation_ratio}}%</h3>
+    <div id="estadisticas-votacion" class="row">
+        <div class="col m6 s12">
+            <div class="card teal">
+                <div class="card-content white-text">
+                    <span class="card-title">{% trans 'Stats' %}</span>
+                    
+                    <div class="row">
+                         <div id="info-texto-left" class="col s3 offset-s3">
+                            <p>{% trans 'Census Size:' %}</p>
+                            <p>{% trans 'Voters Turnout:' %}</p>
+                            <p>{% trans 'Participation:' %}</p>
+                         </div>
+                        <div id="info-texto-right" class="col s3">
+                            <p>{{stats_census_size}}</p>
+                            <p>{{stats_voters_turnout}}</p>
+                            <p>{{stats_participation_ratio}}%</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <a href="pdf/" target="_blank">Descargar los resultado en formato .pdf</a>
-    <br/>
-    <a href="csv/" target="_blank">Descargar los resultado en formato .csv</a>
+        <div class="col m6 s12">
+            <div class="card blue">
+              <div class="card-content">
+                <p class="white-text">{% trans "Interested in the participation according to genders? Check it out!" %}</p>
+              </div>
+              <div class="card-tabs">
+                <ul class="tabs tabs-fixed-width tabs-transparent">
+                    <li class="tab"><a href="#women-participation">{% trans "Women" %}</a></li>
+                    <li class="tab"><a class="active" href="#nonbinary-participation">{% trans "Non-Binary" %}</a></li>
+                    <li class="tab"><a href="#men-participation">{% trans "Men" %}</a></li>
+              </div>
+              <div class="card-content blue lighten-5 centered-text">
+                <div id="women-participation">{{stats_women_participation}} {% trans "women voted" %} - {{stats_women_percentage}}% {% trans "of the total" %}</div>
+                <div id="nonbinary-participation">{{stats_nonbinary_participation}} {% trans "non-binary voted" %} - {{stats_nonbinary_percentage}}% {% trans "of the total" %}</div>
+                <div id="men-participation">{{stats_men_participation}} {% trans "men voted" %} - {{stats_men_percentage}}% {% trans "of the total" %}</div>
+              </div>
+            </div>
+        </div>
+
+        <div class="col m6 s12">
+            <div class="collection">
+                {% for rango, cantidad in stats_voters_age_dist.items %}
+                     <a href="#!" class="collection-item"><span class="badge">{{ cantidad }}%</span>{{rango.0 }} {% trans "to" %} {{ rango.1 }} {% trans "years old" %}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col m6 s12">
+            <ul class="collapsible">
+            <li>
+                <div class="collapsible-header">
+                <i class="material-icons">question_answer</i>
+                    {% trans "The average age of people who voted is..." %}
+                <span class="new badge" data-badge-caption="quiz"></span></div>
+                <div class="collapsible-body">
+                    {% if stats_voters_age_mean %}
+                        <p>{{stats_voters_age_mean}} {% trans "years old" %}</p>
+                    {% else %}
+                        <p>{% trans "Nobody has voted yet :(" %}</p>
+                    {% endif %}
+                </div>
+            </li>
+            <li>
+                <div class="collapsible-header">
+                <i class="material-icons">question_answer</i>
+                    {% trans "The average age of people who didn't vote is..." %}
+                <span class="new badge" data-badge-caption="quiz"></span></div>
+                <div class="collapsible-body">
+                    {% if stats_no_voters_age_mean %}
+                        <p>{{stats_no_voters_age_mean}} {% trans "years old" %}</p>
+                    {% else %}
+                        <p>{% trans "Everyone has voted already :)" %}</p>
+                    {% endif %}
+                </div>
+            </li>
+            </ul>
+            <div class="centered-text">
+                <a href="pdf/" target="_blank">{% trans "Download results as .pdf" %}</a>
+                <br/>
+                <a href="csv/" target="_blank">{% trans "Download results as .csv" %}</a>
+            </div>
+        </div>
 
 {% endblock %}
