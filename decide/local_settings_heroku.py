@@ -26,8 +26,8 @@ DATABASES = {
     },
     'mongo': {
         'ENGINE': 'djongo',
-        'NAME': 'heroku_3m3z6qgk',
-        'HOST': 'mongodb://heroku_3m3z6qgk:eb9k654bcuek4cubheifmmjrhm@ds043170.mlab.com:43170/heroku_3m3z6qgk'
+        'NAME': os.environ['MONGO_NAME'],
+        'HOST': os.environ['MONGODB_URI']
     }
 }
 
