@@ -34,6 +34,10 @@ DATABASES = {
         'USER': 'postgres',
         'HOST': '127.0.0.1',
         'PORT': '5432',
+    },
+    'mongo': {
+        'ENGINE': 'djongo',
+        'NAME': 'mongo',
     }
 }
 

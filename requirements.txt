@@ -15,3 +15,5 @@ python-gettext==4.0
 django-makemessages-xgettext==0.1.1
 social-auth-app-django
 django-nocaptcha-recaptcha
+djongo==1.2.31
+pymongo==3.7.2
