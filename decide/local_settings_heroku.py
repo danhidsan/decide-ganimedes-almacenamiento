@@ -30,7 +30,7 @@ DATABASES = {
         'USER': 'heroku_3m3z6qgk',
         'PASSWORD': 'eb9k654bcuek4cubheifmmjrhm',
         'HOST': 'ds043170.mlab.com',
-        'PORT': 43170
+        'PORT': '43170'
     }
 }
 
