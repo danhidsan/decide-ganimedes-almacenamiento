@@ -78,7 +78,10 @@ MODULES = [
     'voting',
 ]
 
-BASEURL = 'http://localhost:8000'
+#BASEURL = 'http://localhost:8000'
+BASEURL = 'https://decide-ganimedes-store.herokuapp.com'
+
+APIS = {}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
