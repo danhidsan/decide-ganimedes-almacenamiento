@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 
 from voting.models import Voting
+from census.models import Census
 from .models import Vote
 from .serializers import VoteSerializer,VotingSerializer,VoterSerializer
 from base import mods
@@ -14,29 +15,32 @@ from authentication.models import User
 
 
 class VotingView(generics.ListAPIView):
-    serializer_class = VotingSerializer
 
-    def get(self,request,voting_id):
+    def get(self, request, voting_id):
         voting_id = self.kwargs['voting_id']
-        result = Vote.objects.filter(voting_id=voting_id).values('voter_id')
-        voting_users = User.objects.filter(id__in=result)\
-            .values('id', 'last_login', 'is_superuser', 'first_name', 'last_name',
-                    'email', 'is_staff', 'is_active')
-        return Response(voting_users, status=status.HTTP_200_OK)
+        voters = []
+        votes = Vote.objects.filter(voting_id=voting_id).values('voter_id')
+        for v in votes:
+            voter = User.objects.filter(pk=v['voter_id']).values('id', 'last_login', 'is_superuser', 'first_name',
+                                                                 'last_name', 'email', 'is_staff', 'is_active')
+            voters.append(voter)
+        return Response(voters, status=status.HTTP_200_OK)
 
 
 class VoterView(generics.ListAPIView):
     serializer_class = VoterSerializer
 
-    def get(self, request,voter_id):
-        voter_id=self.kwargs['voter_id']
-        votings_id=Vote.objects.filter(voter_id=voter_id).values('voting_id')
-        votings= Voting.objects.filter(id__in=votings_id)\
-            .values('id','name','start_date','end_date','question_id')
-        if votings.exists():
-            result=Response(votings,status=status.HTTP_200_OK)
+    def get(self, request, voter_id):
+        voter_id = self.kwargs['voter_id']
+        votings = []
+        census = Census.objects.filter(voter_id=voter_id).values('voting_id')
+        for c in census:
+            voting = Voting.objects.filter(pk=c['voting_id']).values('id', 'name', 'start_date', 'end_date')
+            votings.append(voting)
+        if len(votings) > 0:
+            result = Response(votings, status=status.HTTP_200_OK)
         else:
-            result= Response(votings,status=status.HTTP_204_NO_CONTENT)
+            result = Response(votings, status=status.HTTP_204_NO_CONTENT)
         return result
 
 
