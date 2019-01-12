@@ -26,7 +26,7 @@ DATABASES = {
     },
     'mongo': {
         'ENGINE': 'djongo',
-        'URI': 'mongodb://heroku_3m3z6qgk:eb9k654bcuek4cubheifmmjrhm@ds043170.mlab.com:43170/heroku_3m3z6qgk'
+        'MONGODB_URI': 'mongodb://heroku_3m3z6qgk:eb9k654bcuek4cubheifmmjrhm@ds043170.mlab.com:43170/heroku_3m3z6qgk'
     }
 }
 
