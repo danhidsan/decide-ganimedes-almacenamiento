@@ -23,7 +23,6 @@ addons:
 services:
   - postgresql
   - mongodb
-  - docker
 
 env:
   - DJANGO_SETTINGS_MODULE="decide.settings"
@@ -44,9 +43,6 @@ script:
   - python ./decide/manage.py compilemessages
   - python ./decide/manage.py test ./decide
   - if [[ $TRAVIS_BRANCH == $RAMA_TRAVIS ]] && [[ $DEPLOY_TRAVIS == "1" ]]; then git archive --format zip --output ./$NOMBRE_ZIP.zip $RAMA_TRAVIS; echo "Zip generado correctamente."; fi
-
-after_success:
-  - ./docker/docker_push.sh
 
 before_deploy:
 - git config --local user.name $USER_TRAVIS
