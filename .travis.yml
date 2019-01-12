@@ -46,7 +46,7 @@ script:
   - if [[ $TRAVIS_BRANCH == $RAMA_TRAVIS ]] && [[ $DEPLOY_TRAVIS == "1" ]]; then git archive --format zip --output ./$NOMBRE_ZIP.zip $RAMA_TRAVIS; echo "Zip generado correctamente."; fi
 
 after_success:
-  - ../docker/docker_push.sh
+  - ./docker/docker_push.sh
 
 before_deploy:
 - git config --local user.name $USER_TRAVIS
