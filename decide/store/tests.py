@@ -213,10 +213,26 @@ class StoreTextCase(BaseTestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_get_votings_success(self):
-        # Generating votings
-        votings, voters = self.gen_votes()
+        VOTING_PK = 1994
+        USER_PK   =46
 
-        response = self.client.get('/store/voting/voter/{}/'.format(voters[1]))
+        # Generate user
+        user = self.get_or_create_user(46)
+
+        #Generate voting
+        voting=self.gen_voting(VOTING_PK)
+
+        #Add user to census
+        census = Census(voting_id=VOTING_PK, voter_id=46)
+        census.save()
+
+        #Generate vote
+        a1 = random.randint(2, 500)
+        b1 = random.randint(2, 500)
+        vote=Vote(voting_id=VOTING_PK,voter_id=46,a=a1,b=b1)
+        vote.save()
+
+        response = self.client.get('/store/voting/voter/{}/'.format(46))
 
         # assert response
         self.assertEqual(response.status_code, 200)
