@@ -10,15 +10,12 @@ RUN pip install ipython
 
 WORKDIR /app
 
-RUN git clone https://github.com/decide-ganimedes/decide-ganimedes.git .
-ADD ./authentication/migrations ./decide/authentication/migrations
-ADD ./base/migrations ./decide/base/migrations
-ADD ./census/migrations ./decide/census/migrations
-ADD ./mixnet/migrations ./decide/mixnet/migrations
-ADD ./store/migrations ./decide/store/migrations
-ADD ./voting/migrations ./decide/voting/migrations
+RUN git clone https://github.com/danhidsan/decide-ganimedes-almacenamiento .
 RUN pip install -r requirements.txt
 
+# change work directory
 WORKDIR /app/decide
+
+# adding local settings
 ADD docker-settings.py /app/decide/local_settings.py
 RUN ./manage.py collectstatic
