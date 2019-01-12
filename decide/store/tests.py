@@ -103,11 +103,11 @@ class StoreTextCase(BaseTestCase):
         response = self.client.post('/store/', data, format='json')
         self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(Vote.objects.count(), 3)
-        self.assertEqual(Vote.objects.first().voting_id, VOTING_PK)
-        self.assertEqual(Vote.objects.first().voter_id, 1)
-        self.assertEqual(Vote.objects.first().a, CTE_A)
-        self.assertEqual(Vote.objects.first().b, CTE_B)
+        self.assertEqual(Vote.objects.filter(voting_id=VOTING_PK).count(), 3)
+        self.assertEqual(Vote.objects.filter(voting_id=VOTING_PK).first().voting_id, VOTING_PK)
+        self.assertEqual(Vote.objects.filter(voting_id=VOTING_PK).first().voter_id, 1)
+        self.assertEqual(Vote.objects.filter(voting_id=VOTING_PK).first().a, CTE_A)
+        self.assertEqual(Vote.objects.filter(voting_id=VOTING_PK).first().b, CTE_B)
 
     def test_vote(self):
         self.gen_votes()
