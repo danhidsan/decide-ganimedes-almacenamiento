@@ -21,6 +21,12 @@ DATABASES = {
         'PASSWORD': 'decide',
         'HOST': '127.0.0.1',
         'PORT': '5432',
+    },
+    'mongo': {
+        'ENGINE': 'djongo',
+        'NAME': 'mongo',
+        'HOST': '127.0.0.1',
+        'PORT': 27017
     }
 }
 
