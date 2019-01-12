@@ -28,7 +28,7 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'mongo',
         'USER': os.environ['MONGO_USER'],
-        'PASS': os.environ['MONGO_PASS'],
+        'PASSWORD': os.environ['MONGO_PASS'],
         'HOST': os.environ['MONGO_HOST'],
         'PORT': int(os.environ['MONGO_PORT'])
     }
