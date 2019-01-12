@@ -1,3 +1,5 @@
+import os
+
 ALLOWED_HOSTS = ["*"]
 
 # Modules in use, commented modules that you won't use
@@ -25,8 +27,10 @@ DATABASES = {
     'mongo': {
         'ENGINE': 'djongo',
         'NAME': 'mongo',
-        'HOST': '127.0.0.1',
-        'PORT': 27017
+        'USER': os.environ['MONGO_USER'],
+        'PASS': os.environ['MONGO_PASS'],
+        'HOST': os.environ['MONGO_HOST'],
+        'PORT': int(os.environ['MONGO_PORT'])
     }
 }
 
