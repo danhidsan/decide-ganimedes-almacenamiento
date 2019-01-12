@@ -26,7 +26,7 @@ DATABASES = {
     },
     'mongo': {
         'ENGINE': 'djongo',
-        'NAME': 'mongo',
+        'NAME': os.environ['MONGO_USER'],
         'USER': os.environ['MONGO_USER'],
         'PASSWORD': os.environ['MONGO_PASS'],
         'HOST': os.environ['MONGO_HOST'],
