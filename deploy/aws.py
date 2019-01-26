@@ -4,9 +4,9 @@ import os
 import logger
 
 
-class AWSInstance(logger.Logger):
+class AWS(logger.Logger):
     """
-    This class manage aws instances.
+    This class manage deploy instances.
     """
     # Max retry.
     MAX_RETRY = 5
@@ -57,22 +57,22 @@ class AWSInstance(logger.Logger):
     def stop_instance(self, retry=0):
             # Start EC2 instance.
         for instance in self.ec2.instances.filter(InstanceIds=[self.instance_id]):
-                # If instance is stopped, we start it.
-                if instance.state['Name'] == 'running' and retry == 0:
-                    instance.stop()
-                    self.msg_info('Instance {} has been stopped'.format(self.instance_id))
-                    return None
-                else:
-                    self.msg_info('Instance is already stopped')
-                    return None
-
-                # wait to start.
-                if retry < self.MAX_RETRY:
-                    self.msg_info('Waiting Instance Response.')
-                    time.sleep(self.WAIT_RETRY)
-                    return self.stop_instance(retry + 1)
-                # max retry number exceeded.
-                self.msg_error('Unexpected error, try again!!')
+            # If instance is stopped, we start it.
+            if instance.state['Name'] == 'running' and retry == 0:
+                instance.stop()
+                self.msg_info('Instance {} has been stopped'.format(self.instance_id))
                 return None
+            else:
+                self.msg_info('Instance is already stopped')
+                return None
+
+            # wait to start.
+            if retry < self.MAX_RETRY:
+                self.msg_info('Waiting Instance Response.')
+                time.sleep(self.WAIT_RETRY)
+                return self.stop_instance(retry + 1)
+            # max retry number exceeded.
+            self.msg_error('Unexpected error, try again!!')
+            return None
 
 
