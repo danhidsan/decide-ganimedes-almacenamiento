@@ -17,3 +17,4 @@ social-auth-app-django
 django-nocaptcha-recaptcha
 djongo==1.2.31
 pymongo==3.7.2
+boto3==1.9.86
