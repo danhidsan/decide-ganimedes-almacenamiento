@@ -1,5 +1,6 @@
 import boto3
 import time
+import os
 import logger
 
 
@@ -15,10 +16,14 @@ class AWSInstance(logger.Logger):
     def __init__(self, instance_id):
         super().__init__()
 
+        # Check credentials
+        if not os.environ['AWS_ACCESS_KEY_ID'] and os.environ['AWS_SECRET_ACCESS_KEY']:
+            raise Exception("AWS credentials not found")
+
         # Connect with EC2.
         self.ec2 = boto3.resource(
-            'ec2', aws_access_key_id='AKIAJECYCIYQP7WKQULA',
-            aws_secret_access_key='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',
+            'ec2', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+            aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
             region_name='eu-west-1'
         )
 
