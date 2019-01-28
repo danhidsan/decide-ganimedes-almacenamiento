@@ -9,12 +9,21 @@ services:
       - db:/var/lib/postgresql/data
     networks:
       - decide
+  mongo:
+    container_name: decide_mongo
+    image: mongo:3.4
+    restart: always
+    ports:
+      - '27017:27017'
+    networks:
+      - decide
+
   web:
     restart: always
     container_name: decide_web
     image: decide_web:latest
     build: .
-    command: ash -c "python manage.py migrate && gunicorn -w 5 decide.wsgi --timeout=500 -b 0.0.0.0:5000"
+    command: ash -c "python manage.py migrate && python manage.py migrate --database=mongo gunicorn -w 5 decide.wsgi --timeout=500 -b 0.0.0.0:5000"
     expose:
       - "5000"
     volumes:

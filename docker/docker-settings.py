@@ -7,7 +7,14 @@ DATABASES = {
         'USER': 'postgres',
         'HOST': 'db',
         'PORT': 5432,
+    },
+    'mongo': {
+        'ENGINE': 'djongo',
+        'NAME': 'mongo',
+        'HOST': '10.5.0.1',
+        'PORT': 27017
     }
+
 }
 
 STATIC_ROOT = '/app/static/'
